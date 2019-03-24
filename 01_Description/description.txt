@@ -1,0 +1,1 @@
+This stack deploys a SFTP server with a single Office user and one single Public user.

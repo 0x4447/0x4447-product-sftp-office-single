@@ -1,0 +1,24 @@
+{
+	"EFS": {
+		"Type": "AWS::EFS::FileSystem",
+		"Properties": {
+			"Encrypted": true,
+			"PerformanceMode": "generalPurpose",
+			"FileSystemTags": [
+				{
+					"Key" : "Name",
+					"Value" : "SFTP"
+				},
+				{
+					"Key" : "Source",
+					"Value" : "0x4447 LLC"
+				},
+				{
+					"Key" : "Info",
+					"Value" : "https://0x4447.com"
+				}
+
+			]
+		}
+	}
+}

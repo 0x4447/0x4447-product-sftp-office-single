@@ -1,0 +1,26 @@
+{
+	"CPUBurstAlarm": {
+		"Type": "AWS::CloudWatch::Alarm",
+		"Properties": {
+			"AlarmName": { "Fn::Sub": "${AWS::StackName}-CPU-Burst" },
+			"AlarmDescription": "Track CPU Burst utilization.",
+			"TreatMissingData": "notBreaching",
+			"ActionsEnabled": true,
+			"AlarmActions": [ { "Ref": "SNSTopic" } ],
+			"ComparisonOperator": "GreaterThanOrEqualToThreshold",
+			"EvaluationPeriods": 1,
+			"Unit": "Count",
+			"Period": 300,
+			"Threshold": 100,
+			"Namespace": "AWS/EC2",
+			"MetricName": "CPUSurplusCreditBalance",
+			"Statistic": "Average",
+			"Dimensions": [
+				{
+					"Name": "AutoScalingGroupName",
+					"Value": { "Ref": "EC2AutoScalingGroup" }
+				}
+			]
+		}
+	}
+}

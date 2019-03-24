@@ -1,0 +1,23 @@
+{
+	"OSIDs": {
+		"us-east-2": 		{ "64": "ami-0ee8324901ba9164d" },
+		"us-east-1": 		{ "64": "ami-02013ed1a71752ea7" },
+		"us-west-2": 		{ "64": "ami-08e689a423405d7f6" },
+		"us-west-1": 		{ "64": "ami-0f9d113ee458b4f6e" },
+		"eu-west-3": 		{ "64": "ami-080530ec9712e5948" },
+		"eu-west-2": 		{ "64": "ami-0dbd5595b1b1bdab4" },
+		"eu-west-1": 		{ "64": "ami-06a376457af6d8e1c" },
+		"eu-central-1": 	{ "64": "ami-08782e1cd8f682ceb" },
+		"eu-north-1": 		{ "64": "ami-6462eb1a" },
+		"ap-northeast-2": 	{ "64": "ami-0e1a0346bf9f3b831" },
+		"ap-northeast-1": 	{ "64": "ami-0930347fabaa9cd9c" },
+		"ap-southeast-2": 	{ "64": "ami-065d66d47fcd4dfc2" },
+		"ap-southeast-1": 	{ "64": "ami-0ba62a20f78ef85c8" },
+		"ca-central-1": 	{ "64": "ami-0e8e4723a6ac8bb0f" },
+		"ap-south-1": 		{ "64": "ami-0295b1ab1c6e6f31c" },
+		"sa-east-1": 		{ "64": "ami-0a7a2e3acb791c6dc" },
+		"us-gov-east-1": 	{ "64": "ami-7e15f30f" },
+		"us-gov-west-1": 	{ "64": "ami-8b1e74ea" }
+
+	}
+}

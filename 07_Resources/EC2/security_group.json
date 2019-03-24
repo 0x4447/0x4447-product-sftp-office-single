@@ -1,0 +1,32 @@
+{
+	"SFTPSecurityGroup": {
+		"Type": "AWS::EC2::SecurityGroup",
+		"Properties": {
+			"GroupName": "0x4447_SFTP",
+			"GroupDescription": "This group allow our ECS VPN to accept incoming connections.",
+			"VpcId": { "Ref": "01xVPC" },
+			"SecurityGroupEgress": [
+				{
+					"IpProtocol" : "-1",
+					"FromPort" : -1,
+					"ToPort" : -1,
+					"CidrIp" : "0.0.0.0/0"
+				}
+			],
+			"SecurityGroupIngress": [
+				{
+					"IpProtocol" : "tcp",
+					"FromPort" : 22,
+					"ToPort" : 22,
+					"CidrIp" : "0.0.0.0/0"
+				},
+				{
+					"IpProtocol" : "tcp",
+					"FromPort" : 2049,
+					"ToPort" : 2049,
+					"CidrIp" : "0.0.0.0/0"
+				}
+			]
+		}
+	}
+}
