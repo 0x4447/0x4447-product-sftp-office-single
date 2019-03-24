@@ -11,15 +11,15 @@
 			"UserData": { "Fn::Base64": { "Fn::Join": ["\n", [
 				"#!/bin/bash -x",
 
-				"curl -O https://bootstrap.pypa.io/get-pip.py",
-
-				"sudo python get-pip.py",
-
-				"sudo pip install awscli --upgrade",
-
 				{ "Fn::Sub": "EIP_ID=${09xEIP}" },
 
 				{ "Fn::Sub": "AWS_REGION=${AWS::Region}" },
+
+				{ "Fn::Sub": "EFS_ID=${EFS}" },
+
+				{ "Fn::Sub": "OFFICE_PASSWORD=${OfficePassword}" },
+
+				{ "Fn::Sub": "PUBLIC_PASSWORD=${PublicPassword}" },
 
 				"INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id 2>/dev/null)",
 
@@ -33,7 +33,69 @@
 
 				"sudo yum install -y unzip",
 
+				"curl -O https://bootstrap.pypa.io/get-pip.py",
+
+				"sudo python get-pip.py",
+
+				"sudo pip install awscli --upgrade",
+
 				"sudo systemctl start awslogsd.service",
+
+				"mkdir /mnt/office",
+
+				"sudo mount -t nfs -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport $EFS_ID.efs.$AWS_REGION.amazonaws.com:/ /mnt/office",
+
+				"mkdir /mnt/office/private",
+
+				"mkdir /mnt/office/public",
+
+				"chmod 700 /mnt/office/private",
+
+				"chmod 700 /mnt/office/public",
+
+				"sudo groupadd sftp",
+
+				"sudo useradd -m office -g sftp -s /usr/sbin/nologin -d /mnt/office/private",
+
+				"echo $OFFICE_PASSWORD | passwd --stdin office",
+
+				"sudo useradd -m public -g sftp -s /usr/sbin/nologin -d /mnt/office/public",
+
+				"echo $PUBLIC_PASSWORD | passwd --stdin private",
+
+				"chown -R office:sftp /mnt/office/private",
+
+				"chown -R public:sftp /mnt/office/public",
+
+				"rm /etc/ssh/sshd_config",
+
+				"touch /etc/ssh/sshd_config",
+
+				"touch /etc/ssh/sshd_config",
+
+				"echo \"HostKey /etc/ssh/ssh_host_rsa_key\" >> /etc/ssh/sshd_config",
+				"echo \"HostKey /etc/ssh/ssh_host_ecdsa_key\" >> /etc/ssh/sshd_config",
+				"echo \"HostKey /etc/ssh/ssh_host_ed25519_key\" >> /etc/ssh/sshd_config",
+				"echo \"SyslogFacility AUTHPRIV\" >> /etc/ssh/sshd_config",
+				"echo \"AuthorizedKeysFile .ssh/authorized_keys\" >> /etc/ssh/sshd_config",
+				"echo \"PasswordAuthentication yes\" >> /etc/ssh/sshd_config",
+				"echo \"ChallengeResponseAuthentication no\" >> /etc/ssh/sshd_config",
+				"echo \"GSSAPIAuthentication yes\" >> /etc/ssh/sshd_config",
+				"echo \"GSSAPICleanupCredentials no\" >> /etc/ssh/sshd_config",
+				"echo \"UsePAM yes\" >> /etc/ssh/sshd_config",
+				"echo \"X11Forwarding yes\" >> /etc/ssh/sshd_config",
+				"echo \"AcceptEnv LANG LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES\" >> /etc/ssh/sshd_config",
+				"echo \"AcceptEnv LC_PAPER LC_NAME LC_ADDRESS LC_TELEPHONE LC_MEASUREMENT\" >> /etc/ssh/sshd_config",
+				"echo \"AcceptEnv LC_IDENTIFICATION LC_ALL LANGUAGE\" >> /etc/ssh/sshd_config",
+				"echo \"AcceptEnv XMODIFIERS\" >> /etc/ssh/sshd_config",
+				"echo \"AuthorizedKeysCommand /usr/bin/timeout 5s /opt/aws/bin/curl_authorized_keys %u %f\" >> /etc/ssh/sshd_config",
+				"echo \"AuthorizedKeysCommandUser ec2-instance-connect\" >> /etc/ssh/sshd_config",
+				"echo \"Subsystem sftp internal-sftp\" >> /etc/ssh/sshd_config",
+				"echo \"Match group sftp\" >> /etc/ssh/sshd_config",
+				"echo \"ChrootDirectory /mnt/office\" >> /etc/ssh/sshd_config",
+				"echo \"ForceCommand internal-sftp\" >> /etc/ssh/sshd_config",
+
+				"systemctl restart sshd.service",
 
 				"curl -O https://s3.amazonaws.com/amazoncloudwatch-agent/linux/amd64/latest/AmazonCloudWatchAgent.zip",
 
@@ -126,7 +188,7 @@
 									"/etc/cfn/hooks.d/cfn-auto-reloader.conf"
 								]
 							},
-							"awslogs": {
+							"awslogsd": {
 								"enabled": true,
 								"ensureRunning": true,
 								"files": [
