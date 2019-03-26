@@ -10,12 +10,8 @@
 			"Description": "Provide an email to which to send errors from alarms",
 			"Type": "String"
 		},
-		"OfficePassword": {
+		"Password": {
 			"Description": "Provide the password for the office user.",
-			"Type": "String"
-		},
-		"PublicPassword": {
-			"Description": "Provide the password for the public user.",
 			"Type": "String"
 		},
 		"02xSubnet": {
@@ -352,10 +348,7 @@
 									"Fn::Sub": "EFS_ID=${EFS}"
 								},
 								{
-									"Fn::Sub": "OFFICE_PASSWORD=${OfficePassword}"
-								},
-								{
-									"Fn::Sub": "PUBLIC_PASSWORD=${PublicPassword}"
+									"Fn::Sub": "PASSWORD=${Password}"
 								},
 								"INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id 2>/dev/null)",
 								"aws ec2 associate-address --allocation-id $EIP_ID --instance-id $INSTANCE_ID --allow-reassociation --region=$AWS_REGION",
@@ -367,21 +360,15 @@
 								"sudo python get-pip.py",
 								"sudo pip install awscli --upgrade",
 								"sudo systemctl start awslogsd.service",
-								"mkdir /mnt/office",
-								"sudo mount -t nfs -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport $EFS_ID.efs.$AWS_REGION.amazonaws.com:/ /mnt/office",
-								"mkdir /mnt/office/private",
-								"mkdir /mnt/office/public",
-								"chmod 700 /mnt/office/private",
-								"chmod 700 /mnt/office/public",
+								"mkdir /mnt/drive",
+								"sudo mount -t nfs -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport $EFS_ID.efs.$AWS_REGION.amazonaws.com:/ /mnt/drive",
+								"mkdir /mnt/drive/office",
+								"chmod 700 /mnt/drive/office",
 								"sudo groupadd sftp",
-								"sudo useradd -m office -g sftp -s /usr/sbin/nologin -d /mnt/office/private",
-								"echo $OFFICE_PASSWORD | passwd --stdin office",
-								"sudo useradd -m public -g sftp -s /usr/sbin/nologin -d /mnt/office/public",
-								"echo $PUBLIC_PASSWORD | passwd --stdin private",
-								"chown -R office:sftp /mnt/office/private",
-								"chown -R public:sftp /mnt/office/public",
+								"sudo useradd -m office -g sftp -s /usr/sbin/nologin -d /mnt/drive/office",
+								"echo $PASSWORD | passwd --stdin office",
+								"chown -R office:sftp /mnt/drive/office",
 								"rm /etc/ssh/sshd_config",
-								"touch /etc/ssh/sshd_config",
 								"touch /etc/ssh/sshd_config",
 								"echo \"HostKey /etc/ssh/ssh_host_rsa_key\" >> /etc/ssh/sshd_config",
 								"echo \"HostKey /etc/ssh/ssh_host_ecdsa_key\" >> /etc/ssh/sshd_config",
@@ -393,16 +380,12 @@
 								"echo \"GSSAPIAuthentication yes\" >> /etc/ssh/sshd_config",
 								"echo \"GSSAPICleanupCredentials no\" >> /etc/ssh/sshd_config",
 								"echo \"UsePAM yes\" >> /etc/ssh/sshd_config",
-								"echo \"X11Forwarding yes\" >> /etc/ssh/sshd_config",
-								"echo \"AcceptEnv LANG LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES\" >> /etc/ssh/sshd_config",
-								"echo \"AcceptEnv LC_PAPER LC_NAME LC_ADDRESS LC_TELEPHONE LC_MEASUREMENT\" >> /etc/ssh/sshd_config",
-								"echo \"AcceptEnv LC_IDENTIFICATION LC_ALL LANGUAGE\" >> /etc/ssh/sshd_config",
-								"echo \"AcceptEnv XMODIFIERS\" >> /etc/ssh/sshd_config",
+								"echo \"X11Forwarding no\" >> /etc/ssh/sshd_config",
 								"echo \"AuthorizedKeysCommand /usr/bin/timeout 5s /opt/aws/bin/curl_authorized_keys %u %f\" >> /etc/ssh/sshd_config",
 								"echo \"AuthorizedKeysCommandUser ec2-instance-connect\" >> /etc/ssh/sshd_config",
 								"echo \"Subsystem sftp internal-sftp\" >> /etc/ssh/sshd_config",
 								"echo \"Match group sftp\" >> /etc/ssh/sshd_config",
-								"echo \"ChrootDirectory /mnt/office\" >> /etc/ssh/sshd_config",
+								"echo \"ChrootDirectory /mnt/drive\" >> /etc/ssh/sshd_config",
 								"echo \"ForceCommand internal-sftp\" >> /etc/ssh/sshd_config",
 								"systemctl restart sshd.service",
 								"curl -O https://s3.amazonaws.com/amazoncloudwatch-agent/linux/amd64/latest/AmazonCloudWatchAgent.zip",
