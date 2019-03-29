@@ -1,7 +1,6 @@
 {
 	"VPC": {
-		"Description": "Select the VPC to which to deploy the VPN.",
-		"ConstraintDescription": "must be the name of an existing subnet",
+		"Description": "Select the VPC to which to deploy the SFTP.",
 		"Type": "AWS::EC2::VPC::Id"
 	}
 }

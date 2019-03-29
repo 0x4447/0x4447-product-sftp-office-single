@@ -1,7 +1,6 @@
 {
 	"Subnet": {
-		"Description": "Select the subnet to which to deploy the VPN.",
-		"ConstraintDescription": "must be the name of an existing subnet",
+		"Description": "Select the subnet to which to deploy the VPN. Remember, some subnets don't support all the instance types.",
 		"Type": "AWS::EC2::Subnet::Id"
 	}
 }

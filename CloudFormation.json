@@ -7,25 +7,24 @@
 			"Type": "String"
 		},
 		"Email": {
-			"Description": "Provide an email to which to send errors from alarms",
+			"Description": "Provide an email to which to send errors from alarms. Later you can add more emails to the created SNS Topic.",
 			"Type": "String"
 		},
 		"Password": {
-			"Description": "Provide the password for the office user.",
+			"Description": "Provide the shared password for the SFTP server.",
+			"NoEcho": true,
 			"Type": "String"
 		},
 		"Subnet": {
-			"Description": "Select the subnet to which to deploy the VPN.",
-			"ConstraintDescription": "must be the name of an existing subnet",
+			"Description": "Select the subnet to which to deploy the VPN. Remember, some subnets don't support all the instance types.",
 			"Type": "AWS::EC2::Subnet::Id"
 		},
 		"VPC": {
-			"Description": "Select the VPC to which to deploy the VPN.",
-			"ConstraintDescription": "must be the name of an existing subnet",
+			"Description": "Select the VPC to which to deploy the SFTP.",
 			"Type": "AWS::EC2::VPC::Id"
 		},
 		"VPCCidr": {
-			"Description": "Write the CIDR of the selected VPC to limit the EFS access only from inside the VPC (https://console.aws.amazon.com/vpc/home)",
+			"Description": "Write the CIDR (example: 0.0.0.0/0) of the selected VPC to limit the EFS access only from inside the VPC itself (https://console.aws.amazon.com/vpc/home).",
 			"Type": "String"
 		}
 	},

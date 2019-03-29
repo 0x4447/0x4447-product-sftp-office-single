@@ -1,6 +1,6 @@
 {
 	"Email" : {
-		"Description": "Provide an email to which to send errors from alarms",
+		"Description": "Provide an email to which to send errors from alarms. Later you can add more emails to the created SNS Topic.",
 		"Type": "String"
 	}
 }
