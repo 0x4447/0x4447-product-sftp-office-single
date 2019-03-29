@@ -1,0 +1,6 @@
+{
+	"VPCCidr": {
+		"Description": "Write the CIDR of the selected VPC to limit the EFS access only from inside the VPC (https://console.aws.amazon.com/vpc/home)",
+		"Type": "String"
+	}
+}

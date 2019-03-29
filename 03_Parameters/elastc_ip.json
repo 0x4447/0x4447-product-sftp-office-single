@@ -1,5 +1,5 @@
 {
-	"09xEIP": {
+	"EIP": {
 		"Description": "Type the elastic IP ID that you'd like to associate to the EC2 instance.",
 		"Type": "String"
 	}

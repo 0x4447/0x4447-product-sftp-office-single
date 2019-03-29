@@ -3,7 +3,7 @@
 		"Type": "AWS::EFS::MountTarget",
 		"Properties": {
 			"FileSystemId": { "Ref": "EFS" },
-			"SubnetId": { "Ref": "02xSubnet" },
+			"SubnetId": { "Ref": "Subnet" },
 			"SecurityGroups": [{ "Ref": "SFTPSecurityGroup" }]
 		}
 	}

@@ -2,7 +2,7 @@
 	"AWSTemplateFormatVersion": "2010-09-09",
 	"Description": "This stack deploys a SFTP server with a single Office user and one single Public user.",
 	"Parameters": {
-		"09xEIP": {
+		"EIP": {
 			"Description": "Type the elastic IP ID that you'd like to associate to the EC2 instance.",
 			"Type": "String"
 		},
@@ -14,15 +14,19 @@
 			"Description": "Provide the password for the office user.",
 			"Type": "String"
 		},
-		"02xSubnet": {
+		"Subnet": {
 			"Description": "Select the subnet to which to deploy the VPN.",
 			"ConstraintDescription": "must be the name of an existing subnet",
 			"Type": "AWS::EC2::Subnet::Id"
 		},
-		"01xVPC": {
+		"VPC": {
 			"Description": "Select the VPC to which to deploy the VPN.",
 			"ConstraintDescription": "must be the name of an existing subnet",
 			"Type": "AWS::EC2::VPC::Id"
+		},
+		"VPCCidr": {
+			"Description": "Write the CIDR of the selected VPC to limit the EFS access only from inside the VPC (https://console.aws.amazon.com/vpc/home)",
+			"Type": "String"
 		}
 	},
 	"Mappings": {
@@ -112,7 +116,7 @@
 					"Ref": "EFS"
 				},
 				"SubnetId": {
-					"Ref": "02xSubnet"
+					"Ref": "Subnet"
 				},
 				"SecurityGroups": [
 					{
@@ -269,7 +273,7 @@
 				"MinSize": 1,
 				"VPCZoneIdentifier": [
 					{
-						"Ref": "02xSubnet"
+						"Ref": "Subnet"
 					}
 				]
 			},
@@ -339,7 +343,7 @@
 							[
 								"#!/bin/bash -x",
 								{
-									"Fn::Sub": "EIP_ID=${09xEIP}"
+									"Fn::Sub": "EIP_ID=${EIP}"
 								},
 								{
 									"Fn::Sub": "AWS_REGION=${AWS::Region}"
@@ -544,7 +548,7 @@
 				"GroupName": "0x4447_SFTP",
 				"GroupDescription": "This group allow our ECS VPN to accept incoming connections.",
 				"VpcId": {
-					"Ref": "01xVPC"
+					"Ref": "VPC"
 				},
 				"SecurityGroupEgress": [
 					{
@@ -565,7 +569,9 @@
 						"IpProtocol": "tcp",
 						"FromPort": 2049,
 						"ToPort": 2049,
-						"CidrIp": "0.0.0.0/0"
+						"CidrIp": {
+							"Ref": "VPCCidr"
+						}
 					}
 				]
 			}
