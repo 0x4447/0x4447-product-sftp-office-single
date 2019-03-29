@@ -366,7 +366,7 @@
 								"sudo systemctl start awslogsd.service",
 								"mkdir /mnt/drive",
 								"sudo mount -t nfs -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport $EFS_ID.efs.$AWS_REGION.amazonaws.com:/ /mnt/drive",
-								"mkdir /mnt/drive/office",
+								"mkdir -p /mnt/drive/office",
 								"chmod 700 /mnt/drive/office",
 								"sudo groupadd sftp",
 								"sudo useradd -m office -g sftp -s /usr/sbin/nologin -d /mnt/drive/office",
@@ -475,15 +475,6 @@
 											"[general]",
 											"state_file = /var/lib/awslogs/agent-state",
 											"",
-											"[/var/log/dmesg]",
-											"file = /var/log/dmesg",
-											{
-												"Fn::Sub": "log_group_name = /var/log/dmesg"
-											},
-											{
-												"Fn::Sub": "log_stream_name = SFTP"
-											},
-											"",
 											"[/var/log/messages]",
 											"file = /var/log/messages",
 											{
@@ -494,25 +485,15 @@
 											},
 											"datetime_format = %b %d %H:%M:%S",
 											"",
-											"[/var/log/cloud-init.log]",
-											"file = /var/log/cloud-init.log",
+											"[/var/log/secure]",
+											"file = /var/log/secure",
 											{
-												"Fn::Sub": "log_group_name = /var/log/ecs/audit.log"
+												"Fn::Sub": "log_group_name = /var/log/secure"
 											},
 											{
 												"Fn::Sub": "log_stream_name = SFTP"
 											},
-											"datetime_format = %Y-%m-%dT%H:%M:%SZ",
-											"",
-											"[/var/log/ecs/audit.log]",
-											"file = /var/log/ecs/audit.log.*",
-											{
-												"Fn::Sub": "log_group_name = /var/log/ecs/audit.log"
-											},
-											{
-												"Fn::Sub": "log_stream_name = SFTP"
-											},
-											"datetime_format = %Y-%m-%dT%H:%M:%SZ"
+											"datetime_format = %b %d %H:%M:%S"
 										]
 									]
 								}
