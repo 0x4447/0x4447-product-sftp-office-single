@@ -87,6 +87,26 @@
 		}
 	},
 	"Resources": {
+		"Subscription": {
+			"Type": "AWS::SNS::Subscription",
+			"Properties": {
+				"Endpoint": {
+					"Ref": "Email"
+				},
+				"Protocol": "email",
+				"TopicArn": {
+					"Ref": "SNSTopic"
+				}
+			}
+		},
+		"SNSTopic": {
+			"Type": "AWS::SNS::Topic",
+			"Properties": {
+				"DisplayName": {
+					"Fn::Sub": "${AWS::StackName}-Alert"
+				}
+			}
+		},
 		"EFS": {
 			"Type": "AWS::EFS::FileSystem",
 			"Properties": {
@@ -122,26 +142,6 @@
 						"Ref": "SFTPSecurityGroup"
 					}
 				]
-			}
-		},
-		"Subscription": {
-			"Type": "AWS::SNS::Subscription",
-			"Properties": {
-				"Endpoint": {
-					"Ref": "Email"
-				},
-				"Protocol": "email",
-				"TopicArn": {
-					"Ref": "SNSTopic"
-				}
-			}
-		},
-		"SNSTopic": {
-			"Type": "AWS::SNS::Topic",
-			"Properties": {
-				"DisplayName": {
-					"Fn::Sub": "${AWS::StackName}-Alert"
-				}
 			}
 		},
 		"CloudWatchDashboard": {
