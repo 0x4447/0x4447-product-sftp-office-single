@@ -77,8 +77,6 @@ The best way to take advantage of these benefits is to have a unique AWS Account
 
 - One free Elastic IP per AWS account
 - Free Tree CloudWatch Dashboard for each account
-- Ease of limiting access to this AWS VPN account
-- More precise access to other accounts through VPC Peering
 
 # Pricing
 
