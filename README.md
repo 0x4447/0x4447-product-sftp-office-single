@@ -1,7 +1,8 @@
 # 0x4447 Basic SFTP for the Office – single account
 
+This stack was created after AWS released their unmanaged SFTP solution called [AWS Transfer](https://aws.amazon.com/sftp/). The idea is grate but have limited use cases because of its high price of $0.30 per hour, which on a monthly basis is $216.  This makes it hard to to use as `always on` server. The best use case for what AWS made is for when you need to ingest lots of data in to S3 using a widely standardized protocol for few hours or days. With just few clicks you can be up and running, and then delete the service once done.
 
-This folder `Stack_SFTP_Office` contains a CloudFormation file that, when deployed, will create a SFTP server in your selected AWS account.
+In our case we want to have a SFTP server running all the time and act as network drive, where multiple people can use to store and share data with each other. While making setting up a SFTP server as simple as possible.
 
 The stack is ideal for anyone looking to have their own personal file server or for a small/medium office to share files between employs. Either to cut costs, or to have more control over your files.
 
@@ -11,7 +12,13 @@ This stack is available to anyone at no cost, but on an as-is basis. 0x4447 LLC 
 
 # Before you deploy
 
-Don't expect this stack to do everything for you. For example, the CF file itself can't create the Elastic IP part; you'll need to request a fixed IP and take note of the ID, which you'll use when deploying the CloudFormation file. The next section contains details on why an Elastic IP is important and how it's used.
+Because of CloudFormation limits you still need to do some manual work.
+
+### Elastic IP
+You'll need to request a fixed IP and take note of the ID, which you'll use when deploying the CloudFormation file. The next section contains details on why an Elastic IP is important and how it's used.
+
+### EFS Backups
+Since AWS Backups is a new feature, it is not yet available in CloudFormation. This means that if you want your data to be backed up, you need to set this up manually after deployment. The next section contains details on how to do so.
 
 # How to deploy
 
@@ -51,11 +58,18 @@ The SFTP server is created using SSHd and automatically configured at boot time 
 
 This gives you a very resilient solution that's hard to break.
 
-# Elastic IP magic
+# Manual Work
+
+### Elastic IP
 
 Another important aspect of this stack is that it requires an Elastic IP to work. This is important for preserving continuity. The EC2 instance automatically attaches the provided Elastic IP at boot time, meaning even if the EC2 has to be recreated because there's an issue, it will always have the same IP. This means that anyone using your SFTP server will see only a few minutes of downtime, and then everything will be restored. There's no need to update the DNS settings with a new public IP.
 
 As you can see, once this stack is deployed, it does everything possible to ensure that all moving parts are always available.
+
+### AWS Backups
+
+- Make a plan that suits you. For example: backup once a day, with a retention period of 7 days.
+- Then add your EFS to the backup plan.
 
 # Best practice
 
@@ -75,6 +89,7 @@ This stack generates expenses via three resources (if deployed in a dedicated AW
 - Network traffic
 - CloudWatch Alarms
 - CloudWatch Logs
+- AWS Backup (if manually enabled)
 
 Additional charges may apply if it isn't deployed via a unique AWS Account:
 
