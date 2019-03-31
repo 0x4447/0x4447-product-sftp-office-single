@@ -1,10 +1,10 @@
 # 0x4447 Basic SFTP for the Office – single account
 
-This stack was created after AWS released their unmanaged SFTP solution called [AWS Transfer](https://aws.amazon.com/sftp/). The idea is grate but have limited use cases because of its high price of $0.30 per hour, which on a monthly basis is $216.  This makes it hard to to use as `always on` server. The best use case for what AWS made is for when you need to ingest lots of data in to S3 using a widely standardized protocol for few hours or days. With just few clicks you can be up and running, and then delete the service once done.
+This stack was created after AWS released their unmanaged SFTP solution called [AWS Transfer](https://aws.amazon.com/sftp/). The idea is grate but have limited use cases because of its high price of $0.30 per hour, which on a monthly basis is $0.30 * 24 * 30 = $216.  This makes it hard to to use as `always on`. The best use case for what AWS made is for when you need to ingest lots of data in to S3 using a widely standardized protocol for few hours or days. With just few clicks you can be up and running, and then delete the service once done.
 
-In our case we want to have a SFTP server running all the time and act as network drive, where multiple people can use to store and share data with each other. While making setting up a SFTP server as simple as possible.
+A more normal use case is to have a SFTP server running all the time and act as network drive, where multiple people can use to store and share data with each other when working in different parts of he world. While making setting up a SFTP server as simple as possible.
 
-The stack is ideal for anyone looking to have their own personal file server or for a small/medium office to share files between employs. Either to cut costs, or to have more control over your files.
+The stack is ideal for anyone looking to have their own personal file server or for a small/medium office to share files between employs. Either to cut costs, or to have more control over your files, an get away from the popular cloud solutions which have dubious privacy policies.
 
 # DISCLAIMER!
 
@@ -12,7 +12,7 @@ This stack is available to anyone at no cost, but on an as-is basis. 0x4447 LLC 
 
 # Before you deploy
 
-Because of CloudFormation limits you still need to do some manual work.
+Because of CloudFormation limits you still need to do some manual work before and after deployment.
 
 ### Elastic IP
 You'll need to request a fixed IP and take note of the ID, which you'll use when deploying the CloudFormation file. The next section contains details on why an Elastic IP is important and how it's used.
@@ -47,12 +47,12 @@ The image above shows the stack that deploys. The following is a detailed list o
 
 # How it works
 
-The SFTP server is created using SSHd and automatically configured at boot time using the EC2 `user data` data section. This solution provides multifold benefits:
+The SFTP server is created using SSHd and automatically configured at boot time using the EC2 `user data` section. This solution provides multifold benefits:
 
 - The SSH foundation is solid and stable
 - If the EC2 server is terminated for whatever reason, a new instance will take its place.
-- Terminating the EC2 instance won't delete the data since all the files are stored on EFS, which is mounted at boot time.
-- Since EFS grows with your data you'll never run out of space since the drive grows with your data automatically.
+- Terminating the EC2 instance won't delete the data since all the files are stored on a EFS drive, which is mounted at boot time.
+- Since EFS grows with your data you'll never run out of space. There is also no need to provision the size of the disk prior to deployment.
 
 **Additional benefit**: You can purposely terminate the EC2 instance if you notice that network performance is deteriorating, which can happen when working in a shared VM environment. If this happens, terminate the instance and then wait about five minutes. Hopefully, the new EC2 Instance will be created on a different machine with hopefully less load.
 
@@ -62,25 +62,27 @@ This gives you a very resilient solution that's hard to break.
 
 ### Elastic IP
 
-Another important aspect of this stack is that it requires an Elastic IP to work. This is important for preserving continuity. The EC2 instance automatically attaches the provided Elastic IP at boot time, meaning even if the EC2 has to be recreated because there's an issue, it will always have the same IP. This means that anyone using your SFTP server will see only a few minutes of downtime, and then everything will be restored. There's no need to update the DNS settings with a new public IP.
+An Elastic IP is important for preserving continuity. The EC2 instance automatically attaches the provided Elastic IP at boot time, meaning even if the EC2 has to be recreated because there's an issue, it will always have the same IP. This means that anyone using your SFTP server will see only a few minutes of downtime, and then everything will be restored. There's no need to update the DNS settings with a new public IP.
 
 As you can see, once this stack is deployed, it does everything possible to ensure that all moving parts are always available.
 
 ### AWS Backups
+
+As mentioned at the beginning, if you want you EFS drive data to be backed up, you have to go the AWS Backups consoles yourself for now and create a backup plan. An example:
 
 - Make a plan that suits you. For example: backup once a day, with a retention period of 7 days.
 - Then add your EFS to the backup plan.
 
 # Best practice
 
-The best way to take advantage of these benefits is to have a unique AWS Account for this stack alone. This should be done via the AWS Organization feature, which offers the following advantages:
+The best way to take advantage of this stack is to have a unique AWS Account for this stack alone. This should be done via the AWS Organization feature, which offers the following advantages:
 
 - One free Elastic IP per AWS account
 - Free Tree CloudWatch Dashboard for each account
 
 # Pricing
 
-This stack generates expenses via three resources (if deployed in a dedicated AWS Account):
+This stack generates expenses via thees resources (if deployed in a dedicated AWS Account):
 
 - EFS
 - EC2
@@ -96,7 +98,7 @@ Additional charges may apply if it isn't deployed via a unique AWS Account:
 
 ## CPU Load
 
-Since we're using a t3.nano type server, the monthly price should be around $0.0052/h * 24/h * 30/d = $3.74 a month. Check the [AWS pricing page](https://aws.amazon.com/ec2/pricing/on-demand/) to make sure this calculation is still valid. Also, we're using a T3-type instance, so you might be charged for Burst mode if the CPU time go exceeds the average. In general, the VPN generates very little CPU load. But we're running a complex operating system, so if any process gets stuck in an endless loop or the server is somehow compromised, you should be aware that the CPU load could go way up.
+Since we're using a t3.nano type server, the monthly price should be around $0.0052/h * 24/h * 30/d = $3.74 a month. Check the [AWS pricing page](https://aws.amazon.com/ec2/pricing/on-demand/) to make sure this calculation is still valid. Also, we're using a T3-type instance, so you might be charged for Burst mode if the CPU time go exceeds the average. In general, the SFTP generates a small CPU load. But we're running a complex operating system, so if any process gets stuck in an endless loop or the server is somehow compromised, you should be aware that the CPU load could go way up.
 
 ## Network
 
@@ -108,7 +110,7 @@ The alarms in your account will cost ten cents apiece, and we create three of th
 
 # Monitoring
 
-To provide you with a clear insight into the resources that are available to you, we built a detailed dashboard that graphically shows exactly what's happening in your EC2 instance and container. In addition, it will set alarms to let you know when key aspects of the deployment are acting out, and the EC2 will push logs to CloudWatch to give you a detailed view of the instance's insides without the need for SSH inside the machine.
+To provide you with a clear insight into the resources that are available to you, we built a detailed dashboard that graphically shows exactly what's happening in your EC2 instance and EFS. In addition, it will set alarms to let you know when key aspects of the deployment are acting out, and the EC2 will push logs to CloudWatch to give you a detailed view of the instance's insides without the need for SSH inside the machine.
 
 ## Dashboard
 
