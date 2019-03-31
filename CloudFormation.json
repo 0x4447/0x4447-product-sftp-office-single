@@ -87,26 +87,6 @@
 		}
 	},
 	"Resources": {
-		"Subscription": {
-			"Type": "AWS::SNS::Subscription",
-			"Properties": {
-				"Endpoint": {
-					"Ref": "Email"
-				},
-				"Protocol": "email",
-				"TopicArn": {
-					"Ref": "SNSTopic"
-				}
-			}
-		},
-		"SNSTopic": {
-			"Type": "AWS::SNS::Topic",
-			"Properties": {
-				"DisplayName": {
-					"Fn::Sub": "${AWS::StackName}-Alert"
-				}
-			}
-		},
 		"EFS": {
 			"Type": "AWS::EFS::FileSystem",
 			"Properties": {
@@ -142,6 +122,26 @@
 						"Ref": "SFTPSecurityGroup"
 					}
 				]
+			}
+		},
+		"Subscription": {
+			"Type": "AWS::SNS::Subscription",
+			"Properties": {
+				"Endpoint": {
+					"Ref": "Email"
+				},
+				"Protocol": "email",
+				"TopicArn": {
+					"Ref": "SNSTopic"
+				}
+			}
+		},
+		"SNSTopic": {
+			"Type": "AWS::SNS::Topic",
+			"Properties": {
+				"DisplayName": {
+					"Fn::Sub": "${AWS::StackName}-Alert"
+				}
 			}
 		},
 		"CloudWatchDashboard": {
@@ -329,7 +329,6 @@
 				},
 				"AssociatePublicIpAddress": true,
 				"InstanceType": "t3.nano",
-				"KeyName": "default_development",
 				"SecurityGroups": [
 					{
 						"Ref": "SFTPSecurityGroup"
@@ -340,7 +339,7 @@
 						"Fn::Join": [
 							"\n",
 							[
-								"#!/bin/bash -x",
+								"#!/bin/bash",
 								{
 									"Fn::Sub": "EIP_ID=${EIP}"
 								},
@@ -354,7 +353,6 @@
 									"Fn::Sub": "PASSWORD=${Password}"
 								},
 								"INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id 2>/dev/null)",
-								"aws ec2 associate-address --allocation-id $EIP_ID --instance-id $INSTANCE_ID --allow-reassociation --region=$AWS_REGION",
 								"sudo yum -y update",
 								"sudo yum -y install awslogs",
 								"sudo yum install -y aws-cfn-bootstrap",
@@ -363,6 +361,12 @@
 								"sudo python get-pip.py",
 								"sudo pip install awscli --upgrade",
 								"sudo systemctl start awslogsd.service",
+								"curl -O https://s3.amazonaws.com/amazoncloudwatch-agent/linux/amd64/latest/AmazonCloudWatchAgent.zip",
+								"unzip AmazonCloudWatchAgent.zip",
+								"sudo ./install.sh",
+								"echo ewoJIm1ldHJpY3MiOiB7CgkJIm1ldHJpY3NfY29sbGVjdGVkIjogewoJCQkiY3B1IjogewoJCQkJInJlc291cmNlcyI6IFsiKiJdLAoJCQkJIm1lYXN1cmVtZW50IjogWyJ1c2FnZV9zeXN0ZW0iLCAidXNhZ2VfdXNlciJdLAoJCQkJInRvdGFsY3B1IjogZmFsc2UKCQkJfSwKCQkJImRpc2siOiB7CgkJCQkicmVzb3VyY2VzIjogWyIqIl0sCgkJCQkibWVhc3VyZW1lbnQiOiBbImZyZWUiLCAidG90YWwiLCAidXNlZCJdCgkJCX0sCgkJCSJwcm9jZXNzZXMiOiB7CgkJCQkibWVhc3VyZW1lbnQiOiBbInJ1bm5pbmciLCAic2xlZXBpbmciLCAiZGVhZCJdCgkJCX0sCgkJCSJtZW0iOiB7CgkJCQkibWVhc3VyZW1lbnQiOiBbImF2YWlsYWJsZSIsICJ0b3RhbCIsICJ1c2VkIl0KCQkJfQoJCX0sCgkJImFwcGVuZF9kaW1lbnNpb25zIjogewoJCQkiSW1hZ2VJZCI6ICIke2F3czpJbWFnZUlkfSIsCgkJCSJJbnN0YW5jZUlkIjogIiR7YXdzOkluc3RhbmNlSWR9IiwKCQkJIkluc3RhbmNlVHlwZSI6ICIke2F3czpJbnN0YW5jZVR5cGV9IiwKCQkJIkF1dG9TY2FsaW5nR3JvdXBOYW1lIjogIiR7YXdzOkF1dG9TY2FsaW5nR3JvdXBOYW1lfSIKCQl9LAoJCSJhZ2dyZWdhdGlvbl9kaW1lbnNpb25zIiA6IFtbIkF1dG9TY2FsaW5nR3JvdXBOYW1lIl0sIFsiSW5zdGFuY2VJZCIsICJJbnN0YW5jZVR5cGUiXV0KCX0KfQ== | base64 --decode | sudo tee /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json",
+								"sudo amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s",
+								"aws ec2 associate-address --allocation-id $EIP_ID --instance-id $INSTANCE_ID --allow-reassociation --region=$AWS_REGION",
 								"mkdir /mnt/drive",
 								"sudo mount -t nfs -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport $EFS_ID.efs.$AWS_REGION.amazonaws.com:/ /mnt/drive",
 								"mkdir -p /mnt/drive/office",
@@ -384,18 +388,13 @@
 								"echo \"GSSAPICleanupCredentials no\" >> /etc/ssh/sshd_config",
 								"echo \"UsePAM yes\" >> /etc/ssh/sshd_config",
 								"echo \"X11Forwarding no\" >> /etc/ssh/sshd_config",
-								"echo \"AuthorizedKeysCommand /usr/bin/timeout 5s /opt/aws/bin/curl_authorized_keys %u %f\" >> /etc/ssh/sshd_config",
-								"echo \"AuthorizedKeysCommandUser ec2-instance-connect\" >> /etc/ssh/sshd_config",
 								"echo \"Subsystem sftp internal-sftp\" >> /etc/ssh/sshd_config",
 								"echo \"Match group sftp\" >> /etc/ssh/sshd_config",
 								"echo \"ChrootDirectory /mnt/drive\" >> /etc/ssh/sshd_config",
 								"echo \"ForceCommand internal-sftp\" >> /etc/ssh/sshd_config",
+								"echo \"AuthorizedKeysCommand /usr/bin/timeout 5s /opt/aws/bin/curl_authorized_keys %u %f\" >> /etc/ssh/sshd_config",
+								"echo \"AuthorizedKeysCommandUser ec2-instance-connect\" >> /etc/ssh/sshd_config",
 								"systemctl restart sshd.service",
-								"curl -O https://s3.amazonaws.com/amazoncloudwatch-agent/linux/amd64/latest/AmazonCloudWatchAgent.zip",
-								"unzip AmazonCloudWatchAgent.zip",
-								"sudo ./install.sh",
-								"echo ewoJIm1ldHJpY3MiOiB7CgkJIm1ldHJpY3NfY29sbGVjdGVkIjogewoJCQkiY3B1IjogewoJCQkJInJlc291cmNlcyI6IFsiKiJdLAoJCQkJIm1lYXN1cmVtZW50IjogWyJ1c2FnZV9zeXN0ZW0iLCAidXNhZ2VfdXNlciJdLAoJCQkJInRvdGFsY3B1IjogZmFsc2UKCQkJfSwKCQkJImRpc2siOiB7CgkJCQkicmVzb3VyY2VzIjogWyIqIl0sCgkJCQkibWVhc3VyZW1lbnQiOiBbImZyZWUiLCAidG90YWwiLCAidXNlZCJdCgkJCX0sCgkJCSJwcm9jZXNzZXMiOiB7CgkJCQkibWVhc3VyZW1lbnQiOiBbInJ1bm5pbmciLCAic2xlZXBpbmciLCAiZGVhZCJdCgkJCX0sCgkJCSJtZW0iOiB7CgkJCQkibWVhc3VyZW1lbnQiOiBbImF2YWlsYWJsZSIsICJ0b3RhbCIsICJ1c2VkIl0KCQkJfQoJCX0sCgkJImFwcGVuZF9kaW1lbnNpb25zIjogewoJCQkiSW1hZ2VJZCI6ICIke2F3czpJbWFnZUlkfSIsCgkJCSJJbnN0YW5jZUlkIjogIiR7YXdzOkluc3RhbmNlSWR9IiwKCQkJIkluc3RhbmNlVHlwZSI6ICIke2F3czpJbnN0YW5jZVR5cGV9IiwKCQkJIkF1dG9TY2FsaW5nR3JvdXBOYW1lIjogIiR7YXdzOkF1dG9TY2FsaW5nR3JvdXBOYW1lfSIKCQl9LAoJCSJhZ2dyZWdhdGlvbl9kaW1lbnNpb25zIiA6IFtbIkF1dG9TY2FsaW5nR3JvdXBOYW1lIl0sIFsiSW5zdGFuY2VJZCIsICJJbnN0YW5jZVR5cGUiXV0KCX0KfQ== | base64 --decode | sudo tee /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json",
-								"sudo amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s",
 								{
 									"Fn::Sub": "sudo /opt/aws/bin/cfn-init -v --region ${AWS::Region} --stack ${AWS::StackName} --resource EC2LaunchConfiguration"
 								},
