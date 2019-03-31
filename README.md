@@ -22,10 +22,10 @@ Since AWS Backups is a new feature, it is not yet available in CloudFormation. T
 
 # How to deploy
 
-<a target="_blank" href="https://console.aws.amazon.com/cloudformation/home#/stacks/new?stackName=zer0x4447-SFTP&templateURL=https://s3.amazonaws.com/0x4447-drive-cloudformation/sftp.json">
+<a target="_blank" href="https://console.aws.amazon.com/cloudformation/home#/stacks/new?stackName=zer0x4447-SFTP&templateURL=https://s3.amazonaws.com/0x4447-drive-cloudformation/sftp-basic.json">
 <img align="left" style="float: left; margin: 0 10px 0 0;" src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png"></a>
 
-To deploy this stack just click the button to the left (But before you do that, make sure you are subscribed to [Amazon ECS-Optimized Amazon Linux AMI](https://aws.amazon.com/marketplace/pp/B06XS8WHGJ)), and follow the instructions that CloudFormation provides in your AWS Dashboard. Alternatively you can download the CF file from [here](https://s3.amazonaws.com/0x4447-drive-cloudformation/sftp.json).
+To deploy this stack just click the button to the left (But before you do that, make sure you are subscribed to [Amazon ECS-Optimized Amazon Linux AMI](https://aws.amazon.com/marketplace/pp/B06XS8WHGJ)), and follow the instructions that CloudFormation provides in your AWS Dashboard. Alternatively you can download the CF file from [here](https://s3.amazonaws.com/0x4447-drive-cloudformation/sftp-basic.json).
 
 # What deploys
 
