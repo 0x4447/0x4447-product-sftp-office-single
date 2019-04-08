@@ -1,10 +1,10 @@
 # 0x4447 Basic SFTP for the Office – single account
 
-This stack was created after AWS released their unmanaged SFTP solution called [AWS Transfer](https://aws.amazon.com/sftp/). The idea is grate but have limited use cases because of its high price of $0.30 per hour, which on a monthly basis is $0.30 * 24 * 30 = $216.  This makes it hard to to use as `always on`. The best use case for what AWS made is for when you need to ingest lots of data in to S3 using a widely standardized protocol for few hours or days. With just few clicks you can be up and running, and then delete the service once done.
+We created this stack after AWS released their unmanaged SFTP solution [AWS Transfer](https://aws.amazon.com/sftp/). They had a great concept, but it comes with limited-use issues at its $0.30 per hour, which on a monthly basis is $0.30 * 24 * 30 = $216. This makes it hard to use as a `always on` service. The best use case for the AWS solution is for when you need to inject lots of data into S3 for few hours or days using a widely standardized protocol. You can be up and running with just a few clicks, and then delete the service once done.
 
-A more normal use case is to have a SFTP server running all the time and act as network drive, where multiple people can use to store and share data with each other when working in different parts of he world. While making setting up a SFTP server as simple as possible.
+A more normal use case is to have an SFTP server running all the time and acting as a network drive that multiple people in different parts of the world can use for storing and sharing data with each other.
 
-The stack is ideal for anyone looking to have their own personal file server or for a small/medium office to share files between employs. Either to cut costs, or to have more control over your files, an get away from the popular cloud solutions which have dubious privacy policies.
+The stack is ideal for anyone looking to have their own personal file server or for a small to medium office to share files among employees. It can help you cut costs, have more control over your files, and get away from popular cloud solutions that have dubious privacy policies.
 
 # DISCLAIMER!
 
@@ -18,7 +18,7 @@ Because of CloudFormation limits you still need to do some manual work before an
 You'll need to request a fixed IP and take note of the ID, which you'll use when deploying the CloudFormation file. The next section contains details on why an Elastic IP is important and how it's used.
 
 ### EFS Backups
-Since AWS Backups is a new feature, it is not yet available in CloudFormation. This means that if you want your data to be backed up, you need to set this up manually after deployment. The next section contains details on how to do so.
+As a new feature, AWS Backups isn't yet available in CloudFormation. If you want your data backed up, set this up manually after deployment. The next section contains details on how to do so.
 
 # How to deploy
 
@@ -49,10 +49,10 @@ The image above shows the stack that deploys. The following is a detailed list o
 
 The SFTP server is created using SSHd and automatically configured at boot time using the EC2 `user data` section. This solution provides multifold benefits:
 
-- The SSH foundation is solid and stable
-- If the EC2 server is terminated for whatever reason, a new instance will take its place.
-- Terminating the EC2 instance won't delete the data since all the files are stored on a EFS drive, which is mounted at boot time.
-- Since EFS grows with your data you'll never run out of space. There is also no need to provision the size of the disk prior to deployment.
+- The SSH foundation is solid and stable.
+- If the EC2 server is terminated for any reason, a new instance takes its place.
+- Terminating the EC2 instance won't delete the data, because all files are stored on an EFS drive that's mounted at boot time.
+- Since EFS grows with your data, you'll never run out of space. There's also no need to specify disk size prior to deployment.
 
 **Additional benefit**: You can purposely terminate the EC2 instance if you notice that network performance is deteriorating, which can happen when working in a shared VM environment. If this happens, terminate the instance and then wait about five minutes. Hopefully, the new EC2 Instance will be created on a different machine with hopefully less load.
 
@@ -68,10 +68,10 @@ As you can see, once this stack is deployed, it does everything possible to ensu
 
 ### AWS Backups
 
-As mentioned at the beginning, if you want you EFS drive data to be backed up, you have to go the AWS Backups consoles yourself for now and create a backup plan. An example:
+As previously mentioned, at this point in time you need to go to the AWS Backups consoles to manually create your backup plan. An example:
 
-- Make a plan that suits you. For example: backup once a day, with a retention period of 7 days.
-- Then add your EFS to the backup plan.
+- Make a plan that suits you. For example: backup once a day with a retention period of 7 days.
+- Add your EFS to the backup plan.
 
 # Best practice
 
