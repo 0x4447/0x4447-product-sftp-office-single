@@ -1,0 +1,35 @@
+{
+	"BackupRole": {
+		"Type": "AWS::IAM::Role",
+		"Properties": {
+			"RoleName": "0x4447_SFTP_backup",
+			"AssumeRolePolicyDocument": {
+				"Version": "2012-10-17",
+				"Statement": [
+					{
+						"Effect": "Allow",
+						"Principal": {
+							"Service": "backup.amazonaws.com"
+						},
+						"Action": "sts:AssumeRole"
+					}
+				]
+			},
+			"Policies": [
+				{
+					"PolicyName" : "backup",
+					"PolicyDocument" : {
+						"Version": "2012-10-17",
+						"Statement": [
+							{
+								"Effect": "Allow",
+								"Action": "*",
+								"Resource": "*"
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

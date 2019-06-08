@@ -17,9 +17,6 @@ Because of CloudFormation limits you still need to do some manual work before an
 ### Elastic IP
 You'll need to request a fixed IP and take note of the ID, which you'll use when deploying the CloudFormation file. The next section contains details on why an Elastic IP is important and how it's used.
 
-### EFS Backups
-As a new feature, AWS Backups isn't yet available in CloudFormation. If you want your data backed up, set this up manually after deployment. The next section contains details on how to do so.
-
 # How to deploy
 
 <a target="_blank" href="https://console.aws.amazon.com/cloudformation/home#/stacks/new?stackName=zer0x4447-SFTP&templateURL=https://s3.amazonaws.com/0x4447-drive-cloudformation/sftp-basic.json">
@@ -38,6 +35,11 @@ The image above shows the stack that deploys. The following is a detailed list o
 	- 1x Launch Configuration
 	- 1x Auto Scaling Group
 	- 1x Security Group
+- 1x Backup
+    - 1x Plan
+    - 1x Role
+    - 1x Selection
+    - 1x Vault
 - 1x CloudWatch Dashboard
 - 1x CloudWatch Logs
 - 3x CloudWatch Alerts
@@ -65,13 +67,6 @@ This gives you a very resilient solution that's hard to break.
 An Elastic IP is important for preserving continuity. The EC2 instance automatically attaches the provided Elastic IP at boot time, meaning even if the EC2 has to be recreated because there's an issue, it will always have the same IP. This means that anyone using your SFTP server will see only a few minutes of downtime, and then everything will be restored. There's no need to update the DNS settings with a new public IP.
 
 As you can see, once this stack is deployed, it does everything possible to ensure that all moving parts are always available.
-
-### AWS Backups
-
-As previously mentioned, at this point in time you need to go to the AWS Backups consoles to manually create your backup plan. An example:
-
-- Make a plan that suits you. For example: backup once a day with a retention period of 7 days.
-- Add your EFS to the backup plan.
 
 # Best practice
 

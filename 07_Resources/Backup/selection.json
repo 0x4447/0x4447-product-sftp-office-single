@@ -1,0 +1,15 @@
+{
+	"BackupSelection": {
+	"Type": "AWS::Backup::BackupSelection",
+		"Properties": {
+			"BackupPlanId": { "Ref": "BackupPlan" },
+			"BackupSelection": {
+				"IamRoleArn": { "Fn::GetAtt": ["BackupRole", "Arn"] },
+				"Resources": [
+					{ "Fn::Sub": "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:volume/${EFS}" }
+				],
+				"SelectionName": "0x4447_SFTP"
+			}
+		}
+	}
+}

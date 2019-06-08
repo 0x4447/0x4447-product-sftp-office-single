@@ -1,0 +1,8 @@
+{
+	"BackupVault": {
+		"Type" : "AWS::Backup::BackupVault",
+		"Properties" : {
+			"BackupVaultName": "0x4447_SFTP"
+		}
+	}
+}
