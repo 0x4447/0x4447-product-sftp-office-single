@@ -1,0 +1,20 @@
+{
+	"BackupPlan": {
+		"Type" : "AWS::Backup::BackupPlan",
+		"Properties" : {
+			"BackupPlan" : {
+				"BackupPlanName": "0x4447_SFTP",
+				"BackupPlanRule": [
+					{
+						"RuleName": "7 Days",
+						"TargetBackupVault" : { "Ref": "BackupVault" },
+						"Lifecycle": {
+							"DeleteAfterDays": 7
+						},
+						"ScheduleExpression": "cron(0 0 * * ? *)"
+					}
+				]
+			}
+		}
+	}
+}
