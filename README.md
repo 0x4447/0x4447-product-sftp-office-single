@@ -84,7 +84,7 @@ This stack generates expenses via thees resources (if deployed in a dedicated AW
 - Network traffic
 - CloudWatch Alarms
 - CloudWatch Logs
-- AWS Backup (if manually enabled)
+- AWS Backup
 
 Additional charges may apply if it isn't deployed via a unique AWS Account:
 
