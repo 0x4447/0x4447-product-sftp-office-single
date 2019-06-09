@@ -6,11 +6,6 @@
 			"Description": "Provide an email to which to send errors from alarms. Later you can add more emails to the created SNS Topic.",
 			"Type": "String"
 		},
-		"Password": {
-			"Description": "Provide the shared password for the SFTP server.",
-			"NoEcho": true,
-			"Type": "String"
-		},
 		"EIP": {
 			"Description": "Type the elastic IP ID that you'd like to associate to the EC2 instance.",
 			"Type": "String"
@@ -26,6 +21,11 @@
 		"VPC": {
 			"Description": "Select the VPC to which to deploy the SFTP.",
 			"Type": "AWS::EC2::VPC::Id"
+		},
+		"Password": {
+			"Description": "Provide the shared password for the SFTP server.",
+			"NoEcho": true,
+			"Type": "String"
 		}
 	},
 	"Mappings": {
@@ -160,6 +160,12 @@
 				]
 			}
 		},
+		"BackupVault": {
+			"Type": "AWS::Backup::BackupVault",
+			"Properties": {
+				"BackupVaultName": "0x4447_SFTP"
+			}
+		},
 		"BackupSelection": {
 			"Type": "AWS::Backup::BackupSelection",
 			"Properties": {
@@ -175,17 +181,11 @@
 					},
 					"Resources": [
 						{
-							"Fn::Sub": "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:volume/${EFS}"
+							"Fn::Sub": "arn:aws:elasticfilesystem:${AWS::Region}:${AWS::AccountId}:file-system/${EFS}"
 						}
 					],
 					"SelectionName": "0x4447_SFTP"
 				}
-			}
-		},
-		"BackupVault": {
-			"Type": "AWS::Backup::BackupVault",
-			"Properties": {
-				"BackupVaultName": "0x4447_SFTP"
 			}
 		},
 		"EFS": {
@@ -223,20 +223,6 @@
 						"Ref": "SFTPSecurityGroup"
 					}
 				]
-			}
-		},
-		"ECSInstanceProfile": {
-			"Type": "AWS::IAM::InstanceProfile",
-			"Properties": {
-				"Path": "/",
-				"Roles": [
-					{
-						"Ref": "EC2Role"
-					}
-				],
-				"InstanceProfileName": {
-					"Fn::Sub": "${AWS::StackName}-IP"
-				}
 			}
 		},
 		"EC2AutoScalingGroup": {
@@ -437,16 +423,6 @@
 											"[general]",
 											"state_file = /var/lib/awslogs/agent-state",
 											"",
-											"[/var/log/messages]",
-											"file = /var/log/messages",
-											{
-												"Fn::Sub": "log_group_name = /var/log/messages"
-											},
-											{
-												"Fn::Sub": "log_stream_name = SFTP"
-											},
-											"datetime_format = %b %d %H:%M:%S",
-											"",
 											"[/var/log/secure]",
 											"file = /var/log/secure",
 											{
@@ -517,6 +493,20 @@
 						}
 					}
 				]
+			}
+		},
+		"ECSInstanceProfile": {
+			"Type": "AWS::IAM::InstanceProfile",
+			"Properties": {
+				"Path": "/",
+				"Roles": [
+					{
+						"Ref": "EC2Role"
+					}
+				],
+				"InstanceProfileName": {
+					"Fn::Sub": "${AWS::StackName}-IP"
+				}
 			}
 		},
 		"EC2Role": {

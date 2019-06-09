@@ -6,7 +6,7 @@
 			"BackupSelection": {
 				"IamRoleArn": { "Fn::GetAtt": ["BackupRole", "Arn"] },
 				"Resources": [
-					{ "Fn::Sub": "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:volume/${EFS}" }
+					{ "Fn::Sub": "arn:aws:elasticfilesystem:${AWS::Region}:${AWS::AccountId}:file-system/${EFS}" }
 				],
 				"SelectionName": "0x4447_SFTP"
 			}
